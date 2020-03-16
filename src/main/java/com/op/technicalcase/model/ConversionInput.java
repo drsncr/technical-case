@@ -1,5 +1,6 @@
 package com.op.technicalcase.model;
 
+
 import java.math.BigDecimal;
 
 public class ConversionInput {

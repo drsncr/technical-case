@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
+import javax.money.UnknownCurrencyException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,16 +16,21 @@ public class ConversionInputValidator {
 
     public List<String> validate(ConversionInput conversionInput){
         List<String> exceptionFields = new ArrayList<>();
-        currencyUnit = Monetary.getCurrency(conversionInput.getSourceCurrency());
-        if(currencyUnit == null)
-            exceptionFields.add("sourceCurrency");
 
-        currencyUnit = Monetary.getCurrency(conversionInput.getTargetCurrency());
-        if(currencyUnit == null)
-            exceptionFields.add("targetCurrency");
+        try{ currencyUnit = Monetary.getCurrency(conversionInput.getSourceCurrency()); }
+        catch (UnknownCurrencyException ex) { exceptionFields.add("sourceCurrency"); }
 
-        if (conversionInput.getSourceAmount().compareTo(BigDecimal.ZERO) >= 0)
+        try{ currencyUnit = Monetary.getCurrency(conversionInput.getTargetCurrency()); }
+        catch (UnknownCurrencyException ex) { exceptionFields.add("targetCurrency"); }
+
+        if (conversionInput.getSourceAmount() == null) {
             exceptionFields.add("sourceAmount");
+        }
+        else{
+            if(conversionInput.getSourceAmount().compareTo(BigDecimal.ZERO) < 0){
+                exceptionFields.add("sourceAmount");
+            }
+        }
 
         return exceptionFields;
     }
