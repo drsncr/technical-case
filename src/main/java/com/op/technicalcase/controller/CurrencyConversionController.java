@@ -1,7 +1,9 @@
 package com.op.technicalcase.controller;
 
 import com.op.technicalcase.exception.ExchangeRateNotFoundException;
+import com.op.technicalcase.exception.InSufficientQueryParamException;
 import com.op.technicalcase.exception.InvalidFieldException;
+import com.op.technicalcase.model.Conversion;
 import com.op.technicalcase.model.ConversionInput;
 import com.op.technicalcase.model.ConversionOutput;
 import com.op.technicalcase.model.ExchangeRate;
@@ -17,6 +19,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -37,18 +43,34 @@ public class CurrencyConversionController {
     @Autowired
     CurrencyConversionService conversionService;
 
-    @GetMapping(value="/exchange-rate/{sourceCurrency}/{targetCurrency}", consumes = APPLICATION_JSON_VALUE)
+    @GetMapping(value="/exchange-rate/{sourceCurrency}/{targetCurrency}", produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Gets the exchange of source currency and target currency pair")
-    public ResponseEntity<BigDecimal> getExchangeRate(@PathVariable String sourceCurrency, @PathVariable String targetCurrency) throws InvalidFieldException, ExchangeRateNotFoundException{
+    public ResponseEntity<BigDecimal> getExchangeRate(@PathVariable String sourceCurrency, @PathVariable String targetCurrency)
+            throws InvalidFieldException, ExchangeRateNotFoundException
+    {
         BigDecimal exchangeRate = exchangeRateService.getRateFromApi(sourceCurrency, targetCurrency);
         return new ResponseEntity<>(exchangeRate, HttpStatus.CREATED);
     }
 
     @PostMapping(value="/target", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Converts given amount in certain currency to target currency")
-    public ResponseEntity<ConversionOutput> convertToTargetCurrency(@RequestBody ConversionInput conversionInput) throws InvalidFieldException, ExchangeRateNotFoundException {
+    public ResponseEntity<ConversionOutput> convertToTargetCurrency(@RequestBody ConversionInput conversionInput)
+            throws InvalidFieldException, ExchangeRateNotFoundException
+    {
         ConversionOutput conversionOutput = conversionService.convertToTargetCurrency(conversionInput);
         return new ResponseEntity<>(conversionOutput, HttpStatus.CREATED);
+    }
+
+    @GetMapping(value="/list", produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Gets the list of filtered conversions via id and creation date")
+    public ResponseEntity<List<Conversion>> getConversionList(@RequestParam(required = false) Long id,
+                                                              @RequestParam(required = false) String creationDateString,
+                                                              @RequestParam(required = false, defaultValue = "0") Integer page,
+                                                              @RequestParam(required = false, defaultValue = "5") Integer size)
+            throws InSufficientQueryParamException, DateTimeParseException
+    {
+        List<Conversion> conversionList = conversionService.getConversions(id, creationDateString, page, size);
+        return new ResponseEntity<>(conversionList, HttpStatus.OK);
     }
 
 

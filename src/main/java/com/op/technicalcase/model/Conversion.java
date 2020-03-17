@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 public class Conversion implements Serializable {
@@ -26,11 +26,11 @@ public class Conversion implements Serializable {
     private String sourceCurrency;
     private BigDecimal targetAmount;
     private String targetCurrency;
-    private LocalDateTime creationDate;
+    private LocalDate creationDate;
 
     @PrePersist
     private void setCreationDate(){
-        this.creationDate = LocalDateTime.now();
+        this.creationDate = LocalDate.now();
     }
 
     public Long getId() {
@@ -57,7 +57,7 @@ public class Conversion implements Serializable {
         return targetCurrency;
     }
 
-    public LocalDateTime getCreationDate() {
+    public LocalDate getCreationDate() {
         return creationDate;
     }
 

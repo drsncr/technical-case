@@ -6,6 +6,8 @@ import com.op.technicalcase.model.ExchangeRate;
 import com.op.technicalcase.validation.RatesApiValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -37,7 +39,10 @@ public class ExchangeRateService {
             throw new InvalidFieldException(exceptionFields.toString());
 
         String formattedRatesApiUrl = String.format(this.ratesApiUrl, sourceCurrency, targetCurrency);
-        ExchangeRate exchangeRate = restTemplate.getForObject(formattedRatesApiUrl, ExchangeRate.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("user-agent", "Application");
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ExchangeRate exchangeRate = restTemplate.getForObject(formattedRatesApiUrl, ExchangeRate.class, entity);
 
         if(exchangeRate != null && exchangeRate.getRates().size() > 0)
             return exchangeRate.getRates().get(targetCurrency);
