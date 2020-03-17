@@ -1,13 +1,13 @@
 package com.op.technicalcase.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Map;
 
 public class ExchangeRate {
     private String base;
     private Map<String, BigDecimal> rates;
-    private LocalDateTime date;
+    private LocalDate date;
 
     public String getBase() {
         return base;
@@ -25,11 +25,11 @@ public class ExchangeRate {
         this.rates = rates;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 }

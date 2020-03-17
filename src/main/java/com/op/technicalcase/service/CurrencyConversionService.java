@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -32,9 +31,7 @@ public class CurrencyConversionService {
     @Autowired
     CurrencyConversionRepository conversionRepository;
 
-    public ConversionOutput convertToTargetCurrency(ConversionInput conversionInput)
-            throws InvalidFieldException, ExchangeRateNotFoundException
-    {
+    public ConversionOutput convertToTargetCurrency(ConversionInput conversionInput) {
         List<String> exceptionFields = conversionInputValidator.validate(conversionInput);
         if(!exceptionFields.isEmpty())
             throw new InvalidFieldException(exceptionFields.toString());
@@ -50,9 +47,7 @@ public class CurrencyConversionService {
         return conversionOutput;
     }
 
-    public List<Conversion> getConversions(Long id, String creationDateString, Integer page, Integer size)
-            throws InSufficientQueryParamException, DateTimeParseException
-    {
+    public List<Conversion> getConversions(Long id, String creationDateString, Integer page, Integer size) {
         if(id == null && creationDateString.equals(null))
             throw new InSufficientQueryParamException();
 

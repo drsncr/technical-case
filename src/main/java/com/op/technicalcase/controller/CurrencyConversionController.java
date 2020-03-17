@@ -45,18 +45,14 @@ public class CurrencyConversionController {
 
     @GetMapping(value="/exchange-rate/{sourceCurrency}/{targetCurrency}", produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Gets the exchange of source currency and target currency pair")
-    public ResponseEntity<BigDecimal> getExchangeRate(@PathVariable String sourceCurrency, @PathVariable String targetCurrency)
-            throws InvalidFieldException, ExchangeRateNotFoundException
-    {
+    public ResponseEntity<BigDecimal> getExchangeRate(@PathVariable String sourceCurrency, @PathVariable String targetCurrency){
         BigDecimal exchangeRate = exchangeRateService.getRateFromApi(sourceCurrency, targetCurrency);
         return new ResponseEntity<>(exchangeRate, HttpStatus.CREATED);
     }
 
     @PostMapping(value="/target", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Converts given amount in certain currency to target currency")
-    public ResponseEntity<ConversionOutput> convertToTargetCurrency(@RequestBody ConversionInput conversionInput)
-            throws InvalidFieldException, ExchangeRateNotFoundException
-    {
+    public ResponseEntity<ConversionOutput> convertToTargetCurrency(@RequestBody ConversionInput conversionInput){
         ConversionOutput conversionOutput = conversionService.convertToTargetCurrency(conversionInput);
         return new ResponseEntity<>(conversionOutput, HttpStatus.CREATED);
     }
@@ -66,9 +62,7 @@ public class CurrencyConversionController {
     public ResponseEntity<List<Conversion>> getConversionList(@RequestParam(required = false) Long id,
                                                               @RequestParam(required = false) String creationDateString,
                                                               @RequestParam(required = false, defaultValue = "0") Integer page,
-                                                              @RequestParam(required = false, defaultValue = "5") Integer size)
-            throws InSufficientQueryParamException, DateTimeParseException
-    {
+                                                              @RequestParam(required = false, defaultValue = "5") Integer size){
         List<Conversion> conversionList = conversionService.getConversions(id, creationDateString, page, size);
         return new ResponseEntity<>(conversionList, HttpStatus.OK);
     }
