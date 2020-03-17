@@ -1,36 +1,34 @@
 package com.op.technicalcase.validation;
 
 import com.op.technicalcase.model.ConversionInput;
+import com.op.technicalcase.validation.base.AmountValidator;
+import com.op.technicalcase.validation.base.CurrencyValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.money.CurrencyUnit;
-import javax.money.Monetary;
-import javax.money.UnknownCurrencyException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class ConversionInputValidator {
-    CurrencyUnit currencyUnit;
+
+    @Autowired
+    CurrencyValidator currencyValidator;
+
+    @Autowired
+    AmountValidator amountValidator;
 
     public List<String> validate(ConversionInput conversionInput){
         List<String> exceptionFields = new ArrayList<>();
 
-        try{ currencyUnit = Monetary.getCurrency(conversionInput.getSourceCurrency()); }
-        catch (UnknownCurrencyException ex) { exceptionFields.add("sourceCurrency"); }
+        if(!currencyValidator.validate(conversionInput.getSourceCurrency()))
+            exceptionFields.add("sourceCurrency");
 
-        try{ currencyUnit = Monetary.getCurrency(conversionInput.getTargetCurrency()); }
-        catch (UnknownCurrencyException ex) { exceptionFields.add("targetCurrency"); }
+        if(!currencyValidator.validate(conversionInput.getTargetCurrency()))
+            exceptionFields.add("targetCurrency");
 
-        if (conversionInput.getSourceAmount() == null) {
+        if(!amountValidator.validate(conversionInput.getSourceAmount()))
             exceptionFields.add("sourceAmount");
-        }
-        else{
-            if(conversionInput.getSourceAmount().compareTo(BigDecimal.ZERO) < 0){
-                exceptionFields.add("sourceAmount");
-            }
-        }
 
         return exceptionFields;
     }
