@@ -2,30 +2,46 @@ package com.op.technicalcase.controller;
 
 import com.op.technicalcase.constant.ErrorCode;
 import com.op.technicalcase.exception.ExchangeRateNotFoundException;
+import com.op.technicalcase.exception.ExchangeRateServiceNotAvailableException;
 import com.op.technicalcase.exception.InSufficientQueryParamException;
-import com.op.technicalcase.exception.InvalidFieldException;
 import com.op.technicalcase.model.ExceptionObject;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.format.DateTimeParseException;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ExceptionObject> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest webRequest){
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_FIELD_EXCEPTION, ex.getMessage());
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_METHOD_ARGUMENT_EXCEPTION, "Method arguments are not valid");
         return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(InvalidFieldException.class)
-    public ResponseEntity<ExceptionObject> handleInvalidConversionInputException(InvalidFieldException ex, WebRequest webRequest){
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_FIELD_EXCEPTION, ex.getMessage());
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_METHOD_ARGUMENT_EXCEPTION, "Method arguments are not valid");
+        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_METHOD_ARGUMENT_EXCEPTION, "Method arguments are not valid");
+        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<ExceptionObject> handleDateTimeParseException(DateTimeParseException ex, WebRequest webRequest){
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.DATETIME_PARSE_EXCEPTION, "Unrecognized date format. Date format should be dd-MM-yyyy");
         return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
     }
 
@@ -41,17 +57,9 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(DateTimeParseException.class)
-    public ResponseEntity<ExceptionObject> handleDateTimeParseException(DateTimeParseException ex, WebRequest webRequest){
-        String message = "Unrecognized date format. Date format should be dd-MM-yyyy";
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.DATETIME_PARSE_EXCEPTION, ex.getMessage());
-        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionObject> handleGeneralException(Exception ex, WebRequest webRequest){
-        String message = "error";
-        ExceptionObject exceptionObject = new ExceptionObject(209, ex.getMessage());
-        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(ExchangeRateServiceNotAvailableException.class)
+    public ResponseEntity<ExceptionObject> handleExchangeRateServiceNotAvailableException(ExchangeRateServiceNotAvailableException ex, WebRequest webRequest){
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.EXCHANGE_RATE_SERVICE_NOT_AVAILABLE_EXCEPTION, ex.getMessage());
+        return new ResponseEntity<>(exceptionObject, HttpStatus.NOT_FOUND);
     }
 }

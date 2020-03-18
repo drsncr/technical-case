@@ -1,12 +1,9 @@
 package com.op.technicalcase.service;
 
 import com.op.technicalcase.exception.ExchangeRateNotFoundException;
-import com.op.technicalcase.exception.InvalidFieldException;
+import com.op.technicalcase.exception.ExchangeRateServiceNotAvailableException;
 import com.op.technicalcase.model.ExchangeRate;
-import com.op.technicalcase.validation.RatesApiValidator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -15,16 +12,9 @@ import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Currency;
-import java.util.List;
 
 @Service
 public class ExchangeRateService {
-
-    @Autowired
-    RatesApiValidator ratesApiValidator;
-
-    @Autowired
-    Environment environment;
 
     @Value("${rates.api}")
     private String ratesApiUrl;
@@ -42,13 +32,13 @@ public class ExchangeRateService {
     }
 
     public BigDecimal getRateFromApi(Currency sourceCurrency, Currency targetCurrency){
-        List<String> exceptionFields = ratesApiValidator.validate(sourceCurrency.getCurrencyCode(), targetCurrency.getCurrencyCode());
-        if(!exceptionFields.isEmpty())
-            throw new InvalidFieldException(exceptionFields.toString());
-
+        ExchangeRate exchangeRate;
         String formattedRatesApiUrl = String.format(this.ratesApiUrl, sourceCurrency, targetCurrency);
-        ResponseEntity<ExchangeRate> responseEntity = restTemplate.exchange(formattedRatesApiUrl, HttpMethod.GET, this.request, ExchangeRate.class);
-        ExchangeRate exchangeRate = responseEntity.getBody();
+        try{
+            ResponseEntity<ExchangeRate> responseEntity = restTemplate.exchange(formattedRatesApiUrl, HttpMethod.GET, this.request, ExchangeRate.class);
+            exchangeRate = responseEntity.getBody();
+        }
+        catch (Exception ex){ throw new ExchangeRateServiceNotAvailableException(); }
 
         if(exchangeRate != null && exchangeRate.getRates().size() > 0)
             return exchangeRate.getRates().get(targetCurrency.getCurrencyCode());

@@ -7,8 +7,9 @@ import java.math.BigDecimal;
 import java.util.Currency;
 
 public class ConversionInput {
-    @NotNull(message = "Source amount can't be null")
-    @DecimalMin(value = "0", message = "Source amount can't be less than 0")
+
+    @NotNull()
+    @DecimalMin(value = "0")
     private BigDecimal sourceAmount;
 
     @NotNull

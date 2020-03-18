@@ -12,6 +12,8 @@ import java.util.Currency;
 @Entity
 public class Conversion implements Serializable {
 
+    public Conversion(){}
+
     public Conversion(ConversionInput conversionInput){
         this.sourceAmount = conversionInput.getSourceAmount();
         this.sourceCurrency = conversionInput.getSourceCurrency();
