@@ -1,5 +1,6 @@
 package com.op.technicalcase.service;
 
+import com.op.technicalcase.exception.CurrencyNullException;
 import com.op.technicalcase.exception.ExchangeRateNotFoundException;
 import com.op.technicalcase.exception.ExchangeRateServiceNotAvailableException;
 import com.op.technicalcase.model.ExchangeRate;
@@ -32,13 +33,18 @@ public class ExchangeRateService {
     }
 
     public BigDecimal getRateFromApi(Currency sourceCurrency, Currency targetCurrency){
+        if(sourceCurrency == null || targetCurrency == null)
+            throw new CurrencyNullException();
+
         ExchangeRate exchangeRate;
         String formattedRatesApiUrl = String.format(this.ratesApiUrl, sourceCurrency, targetCurrency);
         try{
             ResponseEntity<ExchangeRate> responseEntity = restTemplate.exchange(formattedRatesApiUrl, HttpMethod.GET, this.request, ExchangeRate.class);
             exchangeRate = responseEntity.getBody();
         }
-        catch (Exception ex){ throw new ExchangeRateServiceNotAvailableException(); }
+        catch (Exception ex){
+            throw new ExchangeRateServiceNotAvailableException();
+        }
 
         if(exchangeRate != null && exchangeRate.getRates().size() > 0)
             return exchangeRate.getRates().get(targetCurrency.getCurrencyCode());

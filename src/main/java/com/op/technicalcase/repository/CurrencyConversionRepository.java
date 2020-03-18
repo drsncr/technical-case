@@ -12,6 +12,6 @@ import java.util.List;
 @Repository
 public interface CurrencyConversionRepository extends PagingAndSortingRepository<Conversion, Long> {
 
-    @Query(value = "SELECT c FROM Conversion c WHERE (c.id = ?1 or ?1 is null) and (c.creationDate = ?2 or ?2 is null)")
+    @Query(value = "SELECT c FROM Conversion c WHERE (c.id = ?1 or ?1 is null) AND (c.creationDate = ?2 or ?2 is null)")
     List<Conversion> getConversionList(Long id, LocalDate creationDate, Pageable pageable);
 }

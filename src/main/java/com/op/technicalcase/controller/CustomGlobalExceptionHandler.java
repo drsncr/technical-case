@@ -1,6 +1,7 @@
 package com.op.technicalcase.controller;
 
 import com.op.technicalcase.constant.ErrorCode;
+import com.op.technicalcase.exception.CurrencyNullException;
 import com.op.technicalcase.exception.ExchangeRateNotFoundException;
 import com.op.technicalcase.exception.ExchangeRateServiceNotAvailableException;
 import com.op.technicalcase.exception.InSufficientQueryParamException;
@@ -61,5 +62,11 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     public ResponseEntity<ExceptionObject> handleExchangeRateServiceNotAvailableException(ExchangeRateServiceNotAvailableException ex, WebRequest webRequest){
         ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.EXCHANGE_RATE_SERVICE_NOT_AVAILABLE_EXCEPTION, ex.getMessage());
         return new ResponseEntity<>(exceptionObject, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CurrencyNullException.class)
+    public ResponseEntity<ExceptionObject> handleCurrencyNullException(CurrencyNullException ex, WebRequest webRequest){
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.CURRENCY_NULL_EXCEPTION, ex.getMessage());
+        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
     }
 }
