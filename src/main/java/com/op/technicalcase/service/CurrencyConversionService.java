@@ -32,9 +32,9 @@ public class CurrencyConversionService {
     CurrencyConversionRepository conversionRepository;
 
     public ConversionOutput convertToTargetCurrency(ConversionInput conversionInput) {
-        List<String> exceptionFields = conversionInputValidator.validate(conversionInput);
+/*        List<String> exceptionFields = conversionInputValidator.validate(conversionInput);
         if(!exceptionFields.isEmpty())
-            throw new InvalidFieldException(exceptionFields.toString());
+            throw new InvalidFieldException(exceptionFields.toString());*/
 
         BigDecimal exchangeRate = exchangeRateService.getRateFromApi(conversionInput.getSourceCurrency(), conversionInput.getTargetCurrency());
 

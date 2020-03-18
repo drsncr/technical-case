@@ -1,4 +1,4 @@
-package com.op.technicalcase.advisor;
+package com.op.technicalcase.controller;
 
 import com.op.technicalcase.constant.ErrorCode;
 import com.op.technicalcase.exception.ExchangeRateNotFoundException;
@@ -15,7 +15,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.time.format.DateTimeParseException;
 
 @ControllerAdvice
-public class CurrencyConversionControllerAdvisor extends ResponseEntityExceptionHandler {
+public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ExceptionObject> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest webRequest){
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_FIELD_EXCEPTION, ex.getMessage());
+        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(InvalidFieldException.class)
     public ResponseEntity<ExceptionObject> handleInvalidConversionInputException(InvalidFieldException ex, WebRequest webRequest){
@@ -39,6 +45,13 @@ public class CurrencyConversionControllerAdvisor extends ResponseEntityException
     public ResponseEntity<ExceptionObject> handleDateTimeParseException(DateTimeParseException ex, WebRequest webRequest){
         String message = "Unrecognized date format. Date format should be dd-MM-yyyy";
         ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.DATETIME_PARSE_EXCEPTION, ex.getMessage());
+        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionObject> handleGeneralException(Exception ex, WebRequest webRequest){
+        String message = "error";
+        ExceptionObject exceptionObject = new ExceptionObject(209, ex.getMessage());
         return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
     }
 }

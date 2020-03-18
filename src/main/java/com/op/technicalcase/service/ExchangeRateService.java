@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Currency;
 import java.util.List;
 
 @Service
@@ -40,8 +41,8 @@ public class ExchangeRateService {
         this.restTemplate = new RestTemplate();
     }
 
-    public BigDecimal getRateFromApi(String sourceCurrency, String targetCurrency){
-        List<String> exceptionFields = ratesApiValidator.validate(sourceCurrency, targetCurrency);
+    public BigDecimal getRateFromApi(Currency sourceCurrency, Currency targetCurrency){
+        List<String> exceptionFields = ratesApiValidator.validate(sourceCurrency.getCurrencyCode(), targetCurrency.getCurrencyCode());
         if(!exceptionFields.isEmpty())
             throw new InvalidFieldException(exceptionFields.toString());
 
@@ -50,9 +51,9 @@ public class ExchangeRateService {
         ExchangeRate exchangeRate = responseEntity.getBody();
 
         if(exchangeRate != null && exchangeRate.getRates().size() > 0)
-            return exchangeRate.getRates().get(targetCurrency);
+            return exchangeRate.getRates().get(targetCurrency.getCurrencyCode());
         else
-            throw new ExchangeRateNotFoundException(sourceCurrency, targetCurrency);
+            throw new ExchangeRateNotFoundException(sourceCurrency.getCurrencyCode(), targetCurrency.getCurrencyCode());
     }
 
 }

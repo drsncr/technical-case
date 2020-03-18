@@ -1,7 +1,5 @@
 package com.op.technicalcase.model;
 
-import org.springframework.data.annotation.CreatedDate;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -9,6 +7,7 @@ import javax.persistence.PrePersist;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Currency;
 
 @Entity
 public class Conversion implements Serializable {
@@ -23,9 +22,9 @@ public class Conversion implements Serializable {
     @GeneratedValue
     private Long id;
     private BigDecimal sourceAmount;
-    private String sourceCurrency;
+    private Currency sourceCurrency;
     private BigDecimal targetAmount;
-    private String targetCurrency;
+    private Currency targetCurrency;
     private LocalDate creationDate;
 
     @PrePersist
@@ -41,7 +40,7 @@ public class Conversion implements Serializable {
         return sourceAmount;
     }
 
-    public String getSourceCurrency() {
+    public Currency getSourceCurrency() {
         return sourceCurrency;
     }
 
@@ -53,7 +52,7 @@ public class Conversion implements Serializable {
         this.targetAmount = targetAmount;
     }
 
-    public String getTargetCurrency() {
+    public Currency getTargetCurrency() {
         return targetCurrency;
     }
 

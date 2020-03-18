@@ -1,12 +1,21 @@
 package com.op.technicalcase.model;
 
 
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.Currency;
 
 public class ConversionInput {
+    @NotNull(message = "Source amount can't be null")
+    @DecimalMin(value = "0", message = "Source amount can't be less than 0")
     private BigDecimal sourceAmount;
-    private String sourceCurrency;
-    private String targetCurrency;
+
+    @NotNull
+    private Currency sourceCurrency;
+
+    @NotNull
+    private Currency targetCurrency;
 
     public BigDecimal getSourceAmount() {
         return sourceAmount;
@@ -16,19 +25,19 @@ public class ConversionInput {
         this.sourceAmount = sourceAmount;
     }
 
-    public String getSourceCurrency() {
+    public Currency getSourceCurrency() {
         return sourceCurrency;
     }
 
-    public void setSourceCurrency(String sourceCurrency) {
+    public void setSourceCurrency(Currency sourceCurrency) {
         this.sourceCurrency = sourceCurrency;
     }
 
-    public String getTargetCurrency() {
+    public Currency getTargetCurrency() {
         return targetCurrency;
     }
 
-    public void setTargetCurrency(String targetCurrency) {
+    public void setTargetCurrency(Currency targetCurrency) {
         this.targetCurrency = targetCurrency;
     }
 }

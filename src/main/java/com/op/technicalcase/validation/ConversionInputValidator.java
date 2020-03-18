@@ -21,10 +21,10 @@ public class ConversionInputValidator {
     public List<String> validate(ConversionInput conversionInput){
         List<String> exceptionFields = new ArrayList<>();
 
-        if(!currencyValidator.validate(conversionInput.getSourceCurrency()))
+        if(!currencyValidator.validate(conversionInput.getSourceCurrency().getCurrencyCode()))
             exceptionFields.add("sourceCurrency");
 
-        if(!currencyValidator.validate(conversionInput.getTargetCurrency()))
+        if(!currencyValidator.validate(conversionInput.getTargetCurrency().getCurrencyCode()))
             exceptionFields.add("targetCurrency");
 
         if(!amountValidator.validate(conversionInput.getSourceAmount()))

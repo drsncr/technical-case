@@ -18,10 +18,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.money.CurrencyUnit;
+import javax.money.Monetary;
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Currency;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -46,13 +50,16 @@ public class CurrencyConversionController {
     @GetMapping(value="/exchange-rate/{sourceCurrency}/{targetCurrency}", produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Gets the exchange of source currency and target currency pair")
     public ResponseEntity<BigDecimal> getExchangeRate(@PathVariable String sourceCurrency, @PathVariable String targetCurrency){
-        BigDecimal exchangeRate = exchangeRateService.getRateFromApi(sourceCurrency, targetCurrency);
-        return new ResponseEntity<>(exchangeRate, HttpStatus.CREATED);
+        Currency sCurrency = Currency.getInstance(sourceCurrency);
+        Currency tCurrency = Currency.getInstance(targetCurrency);
+
+        BigDecimal exchangeRate = exchangeRateService.getRateFromApi(sCurrency, tCurrency);
+        return new ResponseEntity<>(exchangeRate, HttpStatus.OK);
     }
 
     @PostMapping(value="/target", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Converts given amount in certain currency to target currency")
-    public ResponseEntity<ConversionOutput> convertToTargetCurrency(@RequestBody ConversionInput conversionInput){
+    public ResponseEntity<ConversionOutput> convertToTargetCurrency(@RequestBody @Valid ConversionInput conversionInput){
         ConversionOutput conversionOutput = conversionService.convertToTargetCurrency(conversionInput);
         return new ResponseEntity<>(conversionOutput, HttpStatus.CREATED);
     }
