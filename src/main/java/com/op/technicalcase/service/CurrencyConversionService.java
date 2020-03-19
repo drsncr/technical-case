@@ -1,7 +1,10 @@
 package com.op.technicalcase.service;
 
 
+import com.op.technicalcase.exception.InvalidConversionInputException;
 import com.op.technicalcase.exception.InSufficientQueryParamException;
+import com.op.technicalcase.exception.InvalidPageNumberException;
+import com.op.technicalcase.exception.InvalidSizeNumberException;
 import com.op.technicalcase.model.Conversion;
 import com.op.technicalcase.model.ConversionFilterObject;
 import com.op.technicalcase.model.ConversionInput;
@@ -27,6 +30,11 @@ public class CurrencyConversionService {
     CurrencyConversionRepository conversionRepository;
 
     public ConversionOutput convertToTargetCurrency(ConversionInput conversionInput) {
+        if(conversionInput == null)
+            throw new InvalidConversionInputException();
+        if(conversionInput.getSourceAmount() == null || conversionInput.getSourceCurrency() == null || conversionInput.getTargetCurrency() == null)
+            throw new InvalidConversionInputException();
+
         BigDecimal exchangeRate = exchangeRateService.getRateFromApi(conversionInput.getSourceCurrency(), conversionInput.getTargetCurrency());
 
         Conversion conversion = new Conversion(conversionInput);
@@ -39,8 +47,12 @@ public class CurrencyConversionService {
     }
 
     public List<Conversion> getConversions(ConversionFilterObject conversionFilterObject, Integer page, Integer size) {
-        if(conversionFilterObject.getId() == null && conversionFilterObject.getCreationDate() == null)
+        if((conversionFilterObject == null) || (conversionFilterObject.getId() == null && conversionFilterObject.getCreationDate() == null))
             throw new InSufficientQueryParamException();
+        if(page < 0)
+            throw new InvalidPageNumberException();
+        if(size < 1)
+            throw new InvalidSizeNumberException();
 
         LocalDate creationDate = null;
         if(conversionFilterObject.getCreationDate() != null){

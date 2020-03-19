@@ -8,4 +8,7 @@ public class ErrorCode {
     public static final int INSUFFICIENT_QUERY_PARAM_EXCEPTION = 104;
     public static final int EXCHANGE_RATE_SERVICE_NOT_AVAILABLE_EXCEPTION = 105;
     public static final int CURRENCY_NULL_EXCEPTION = 106;
+    public static final int INVALID_CONVERSION_INPUT_EXCEPTION = 107;
+    public static final int INVALID_PAGE_NUMBER_EXCEPTION = 108;
+    public static final int INVALID_SIZE_NUMBER_EXCEPTION = 109;
 }

@@ -1,10 +1,7 @@
 package com.op.technicalcase.controller;
 
 import com.op.technicalcase.constant.ErrorCode;
-import com.op.technicalcase.exception.CurrencyNullException;
-import com.op.technicalcase.exception.ExchangeRateNotFoundException;
-import com.op.technicalcase.exception.ExchangeRateServiceNotAvailableException;
-import com.op.technicalcase.exception.InSufficientQueryParamException;
+import com.op.technicalcase.exception.*;
 import com.op.technicalcase.model.ExceptionObject;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
@@ -67,6 +64,24 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     @ExceptionHandler(CurrencyNullException.class)
     public ResponseEntity<ExceptionObject> handleCurrencyNullException(CurrencyNullException ex, WebRequest webRequest){
         ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.CURRENCY_NULL_EXCEPTION, ex.getMessage());
+        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidConversionInputException.class)
+    public ResponseEntity<ExceptionObject> handleConversionInputInvalidException(InvalidConversionInputException ex, WebRequest webRequest){
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_CONVERSION_INPUT_EXCEPTION, ex.getMessage());
+        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidPageNumberException.class)
+    public ResponseEntity<ExceptionObject> handleInvalidPageNumberException(InvalidPageNumberException ex, WebRequest webRequest){
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_PAGE_NUMBER_EXCEPTION, ex.getMessage());
+        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidSizeNumberException.class)
+    public ResponseEntity<ExceptionObject> handleInvalidSizeNumberException(InvalidSizeNumberException ex, WebRequest webRequest){
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_SIZE_NUMBER_EXCEPTION, ex.getMessage());
         return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
     }
 }
