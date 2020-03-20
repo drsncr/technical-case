@@ -4,15 +4,16 @@ import com.op.technicalcase.model.ConversionFilterObject;
 import com.op.technicalcase.model.ConversionInput;
 import com.op.technicalcase.model.CurrencyPair;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.Currency;
-
 @Aspect
 @Component
-public class CurrencyConversionControllerAspect {
+public class CurrencyConversionControllerLogger {
 
     @Before(value = "execution(* com.op.technicalcase.controller.CurrencyConversionController.getExchangeRate*(..)) " +
             "&& args(.., @RequestBody currencyPair)")

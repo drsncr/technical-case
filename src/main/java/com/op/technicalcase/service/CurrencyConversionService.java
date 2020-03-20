@@ -1,8 +1,7 @@
 package com.op.technicalcase.service;
 
-
 import com.op.technicalcase.constant.ErrorMessage;
-import com.op.technicalcase.exception.*;
+import com.op.technicalcase.exception.InvalidParameterException;
 import com.op.technicalcase.model.*;
 import com.op.technicalcase.repository.CurrencyConversionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Service
 public class CurrencyConversionService {

@@ -1,9 +1,7 @@
 package com.op.technicalcase.service;
 
-import com.op.technicalcase.model.Conversion;
-import com.op.technicalcase.model.ConversionFilterObject;
-import com.op.technicalcase.model.ConversionInput;
-import com.op.technicalcase.model.ConversionOutput;
+import com.op.technicalcase.exception.InvalidParameterException;
+import com.op.technicalcase.model.*;
 import com.op.technicalcase.repository.CurrencyConversionRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +12,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
@@ -41,7 +42,10 @@ public class CurrencyConversionServiceTest {
     Conversion conversion;
 
     ConversionFilterObject conversionFilterObject;
+
+    PageInfo pageInfo;
     List<Conversion> conversionList;
+    Page<Conversion> pageableConversionList;
 
     @BeforeEach
     public void init(){
@@ -54,16 +58,18 @@ public class CurrencyConversionServiceTest {
 
         conversionFilterObject = new ConversionFilterObject();
         conversionFilterObject.setId(1l);
-        conversionFilterObject.setCreationDate("19-03-2020");
+        conversionFilterObject.setCreationDate("2020-03-19");
 
+        Pageable pageable = PageRequest.of(0,5);
         conversionList = new ArrayList<>();
         conversionList.add(conversion);
+        pageableConversionList = new PageImpl<>(conversionList, pageable, 10l);
     }
 
     @Test
     public void convertToTargetCurrency_whenConversionInputIsNull_throwsConversionInputInvalidException(){
         conversionInput = null;
-        Assertions.assertThrows(InvalidConversionInputException.class, () -> {
+        Assertions.assertThrows(InvalidParameterException.class, () -> {
             ConversionOutput conversionOutput = currencyConversionService.convertToTargetCurrency(conversionInput);
         });
     }
@@ -72,26 +78,26 @@ public class CurrencyConversionServiceTest {
     public void convertToTargetCurrency_whenOneOfConversionInputAttributeIsNull_throwsConversionInputInvalidException(){
         ConversionInput newConversionInput = conversionInput;
         newConversionInput.setSourceAmount(null);
-        Assertions.assertThrows(InvalidConversionInputException.class, () -> {
+        Assertions.assertThrows(InvalidParameterException.class, () -> {
             ConversionOutput conversionOutput = currencyConversionService.convertToTargetCurrency(conversionInput);
         });
 
         newConversionInput = conversionInput;
         newConversionInput.setSourceCurrency(null);
-        Assertions.assertThrows(InvalidConversionInputException.class, () -> {
+        Assertions.assertThrows(InvalidParameterException.class, () -> {
             ConversionOutput conversionOutput = currencyConversionService.convertToTargetCurrency(conversionInput);
         });
 
         newConversionInput = conversionInput;
         newConversionInput.setTargetCurrency(null);
-        Assertions.assertThrows(InvalidConversionInputException.class, () -> {
+        Assertions.assertThrows(InvalidParameterException.class, () -> {
             ConversionOutput conversionOutput = currencyConversionService.convertToTargetCurrency(conversionInput);
         });
     }
 
     @Test
     public void convertToTargetCurrency_whenValidConversionInput_returnActualValue(){
-        Mockito.when(exchangeRateService.getRateFromApi(Mockito.any(Currency.class), Mockito.any(Currency.class)))
+        Mockito.when(exchangeRateService.getExchangeRate(Mockito.any(Currency.class), Mockito.any(Currency.class)))
                .thenReturn(exchangeRate);
 
         conversion.setTargetAmount(conversionInput.getSourceAmount().multiply(exchangeRate));
@@ -105,8 +111,8 @@ public class CurrencyConversionServiceTest {
     @Test
     public void getConversions_whenConversionFilterObjectIsNull_throwsInSufficientQueryParamException(){
         conversionFilterObject = null;
-        Assertions.assertThrows(InSufficientQueryParamException.class, () -> {
-            List<Conversion> conversionList = currencyConversionService.getConversions(conversionFilterObject, 0, 5);
+        Assertions.assertThrows(InvalidParameterException.class, () -> {
+            PageableConversionListObject pageableConversionListObject = currencyConversionService.getConversions(conversionFilterObject, 0, 5);
         });
     }
 
@@ -114,22 +120,22 @@ public class CurrencyConversionServiceTest {
     public void getConversions_whenIdAndCreationDateIsNull_throwsInSufficientQueryParamException(){
         conversionFilterObject.setId(null);
         conversionFilterObject.setCreationDate(null);
-        Assertions.assertThrows(InSufficientQueryParamException.class, () -> {
-            List<Conversion> conversionList = currencyConversionService.getConversions(conversionFilterObject, 0, 5);
+        Assertions.assertThrows(InvalidParameterException.class, () -> {
+            PageableConversionListObject pageableConversionListObject = currencyConversionService.getConversions(conversionFilterObject, 0, 5);
         });
     }
 
     @Test
     public void getConversions_whenPageNumberIsInvalid_throwsInvalidPageNumberException(){
-        Assertions.assertThrows(InvalidPageNumberException.class, () -> {
-            List<Conversion> conversionList = currencyConversionService.getConversions(conversionFilterObject, -1, 5);
+        Assertions.assertThrows(InvalidParameterException.class, () -> {
+            PageableConversionListObject pageableConversionListObject = currencyConversionService.getConversions(conversionFilterObject, -1, 5);
         });
     }
 
     @Test
     public void getConversions_whenSizeNumberIsInvalid_throwsInvalidPageNumberException(){
-        Assertions.assertThrows(InvalidSizeNumberException.class, () -> {
-            List<Conversion> conversionList = currencyConversionService.getConversions(conversionFilterObject, 0, 0);
+        Assertions.assertThrows(InvalidParameterException.class, () -> {
+            PageableConversionListObject pageableConversionListObject = currencyConversionService.getConversions(conversionFilterObject, 0, 0);
         });
     }
 
@@ -137,7 +143,7 @@ public class CurrencyConversionServiceTest {
     public void getConversions_whenCreationDateIsInvalid_throwsDateTimeParseException(){
         conversionFilterObject.setCreationDate("2020.03.19");
         Assertions.assertThrows(DateTimeParseException.class, () -> {
-            List<Conversion> conversionList = currencyConversionService.getConversions(conversionFilterObject, 0, 5);
+            PageableConversionListObject pageableConversionListObject = currencyConversionService.getConversions(conversionFilterObject, 0, 5);
         });
     }
 
@@ -145,9 +151,9 @@ public class CurrencyConversionServiceTest {
     public void getConversions_whenParametersAreValid_returnActualValue(){
         Mockito.when(currencyConversionRepository.getConversionList(Mockito.any(Long.class),
                 Mockito.any(LocalDate.class),
-                Mockito.any(Pageable.class))).thenReturn(conversionList);
+                Mockito.any(Pageable.class))).thenReturn(pageableConversionList);
 
-        List<Conversion> conversions = currencyConversionService.getConversions(conversionFilterObject, 0, 5);
-        Assertions.assertEquals(conversions.size(), 1);
+        PageableConversionListObject pageableConversionListObject = currencyConversionService.getConversions(conversionFilterObject, 0, 5);
+        Assertions.assertEquals(pageableConversionListObject.getConversionList().size(), 1);
     }
 }

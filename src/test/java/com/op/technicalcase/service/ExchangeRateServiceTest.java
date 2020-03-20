@@ -1,7 +1,6 @@
 package com.op.technicalcase.service;
 
 import com.op.technicalcase.exception.ExchangeRateNotFoundException;
-import com.op.technicalcase.exception.ExchangeRateServiceNotAvailableException;
 import com.op.technicalcase.model.ExchangeRate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,11 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.*;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,13 +23,10 @@ import java.util.Map;
 public class ExchangeRateServiceTest {
 
     @Mock
-    private RestTemplate restTemplate;
+    ExchangeRateClient exchangeRateClient;
 
     @InjectMocks
     ExchangeRateService exchangeRateService;
-
-    @Value("${rates.api}")
-    private String ratesApiUrl;
 
     private Currency tryCurrency;
     private Currency usdCurrency;
@@ -56,68 +48,34 @@ public class ExchangeRateServiceTest {
         exchangeRate.setRates(rates);
     }
 
-    @Test()
-    public void getRateFromApi_whenConversionInputNull_throwsCurrencyNullException(){
-        Assertions.assertThrows(CurrencyNullException.class, () -> {
-            BigDecimal rate = exchangeRateService.getRateFromApi(tryCurrency, null);
-        });
-
-        Assertions.assertThrows(CurrencyNullException.class, () -> {
-            BigDecimal rate = exchangeRateService.getRateFromApi(null, usdCurrency);
-        });
-
-        Assertions.assertThrows(CurrencyNullException.class, () -> {
-            BigDecimal rate = exchangeRateService.getRateFromApi(null, null);
-        });
-    }
-
     @Test
-    public void getRateFromApi_whenCurrencyValid_returnCorrectValue() {
-        ReflectionTestUtils.setField(exchangeRateService, "ratesApiUrl", ratesApiUrl);
+    public void getExchangeRate_whenCurrencyValid_returnCorrectValue() {
+        Mockito.when(exchangeRateClient.getRateFromClient(Mockito.any(Currency.class), Mockito.any(Currency.class)))
+               .thenReturn(exchangeRate);
 
-        Mockito.when(restTemplate.exchange(Mockito.any(String.class), Mockito.<HttpMethod> any(),
-                                           Mockito.<HttpEntity<String>> any(), Mockito.<Class<ExchangeRate>> any()))
-               .thenReturn(new ResponseEntity(exchangeRate, HttpStatus.OK));
-
-        BigDecimal rate = exchangeRateService.getRateFromApi(usdCurrency, tryCurrency);
+        BigDecimal rate = exchangeRateService.getExchangeRate(usdCurrency, tryCurrency);
         Assertions.assertEquals(rate, exchangeRate.getRates().get("TRY"));
     }
 
     @Test
-    public void getRateFromApi_whenExchangeRateServiceUnavailable_throwsExchangeRateServiceNotAvailableException() {
-        ReflectionTestUtils.setField(exchangeRateService, "ratesApiUrl", "https://api.ratesapi.io/api/latesssssst?base=%s&symbols=%s");
-
-        Assertions.assertThrows(ExchangeRateServiceNotAvailableException.class, () -> {
-            BigDecimal rate = exchangeRateService.getRateFromApi(tryCurrency, usdCurrency);
-        });
-    }
-
-    @Test
-    public void getRateFromApi_whenExchangeRateServiceReturnEmptyRateList_throwsExchangeRateNotFoundException() {
+    public void getExchangeRate_whenExchangeRateServiceReturnEmptyRateList_throwsExchangeRateNotFoundException() {
         exchangeRate.getRates().clear();
-        ReflectionTestUtils.setField(exchangeRateService, "ratesApiUrl", ratesApiUrl);
-
-        Mockito.when(restTemplate.exchange(Mockito.any(String.class), Mockito.<HttpMethod> any(),
-                Mockito.<HttpEntity<String>> any(), Mockito.<Class<ExchangeRate>> any()))
-                .thenReturn(new ResponseEntity(exchangeRate, HttpStatus.OK));
+        Mockito.when(exchangeRateClient.getRateFromClient(Mockito.any(Currency.class), Mockito.any(Currency.class)))
+                .thenReturn(exchangeRate);
 
         Assertions.assertThrows(ExchangeRateNotFoundException.class, () -> {
-            BigDecimal rate = exchangeRateService.getRateFromApi(tryCurrency, usdCurrency);
+            BigDecimal rate = exchangeRateService.getExchangeRate(tryCurrency, usdCurrency);
         });
     }
 
     @Test
-    public void getRateFromApi_whenExchangeRateServiceReturnNull_throwsExchangeRateNotFoundException() {
+    public void getExchangeRate_whenExchangeRateServiceReturnNull_throwsExchangeRateNotFoundException() {
         exchangeRate = null;
-
-        ReflectionTestUtils.setField(exchangeRateService, "ratesApiUrl", ratesApiUrl);
-
-        Mockito.when(restTemplate.exchange(Mockito.any(String.class), Mockito.<HttpMethod> any(),
-                Mockito.<HttpEntity<String>> any(), Mockito.<Class<ExchangeRate>> any()))
-                .thenReturn(new ResponseEntity(exchangeRate, HttpStatus.OK));
+        Mockito.when(exchangeRateClient.getRateFromClient(Mockito.any(Currency.class), Mockito.any(Currency.class)))
+                .thenReturn(exchangeRate);
 
         Assertions.assertThrows(ExchangeRateNotFoundException.class, () -> {
-            BigDecimal rate = exchangeRateService.getRateFromApi(tryCurrency, usdCurrency);
+            BigDecimal rate = exchangeRateService.getExchangeRate(tryCurrency, usdCurrency);
         });
     }
 }
