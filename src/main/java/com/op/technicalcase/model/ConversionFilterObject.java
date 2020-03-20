@@ -20,4 +20,12 @@ public class ConversionFilterObject {
     public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
     }
+
+    @Override
+    public String toString() {
+        return "ConversionFilterObject{" +
+                "id=" + id +
+                ", creationDate='" + creationDate + '\'' +
+                '}';
+    }
 }

@@ -41,4 +41,13 @@ public class ConversionInput {
     public void setTargetCurrency(Currency targetCurrency) {
         this.targetCurrency = targetCurrency;
     }
+
+    @Override
+    public String toString() {
+        return "ConversionInput{" +
+                "sourceAmount=" + sourceAmount +
+                ", sourceCurrency=" + sourceCurrency +
+                ", targetCurrency=" + targetCurrency +
+                '}';
+    }
 }

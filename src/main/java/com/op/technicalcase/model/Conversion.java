@@ -21,7 +21,7 @@ public class Conversion implements Serializable {
     }
 
     @Id
-    @GeneratedValue
+    @GeneratedValue()
     private Long id;
     private BigDecimal sourceAmount;
     private Currency sourceCurrency;
@@ -62,4 +62,15 @@ public class Conversion implements Serializable {
         return creationDate;
     }
 
+    @Override
+    public String toString() {
+        return "Conversion{" +
+                "id=" + id +
+                ", sourceAmount=" + sourceAmount +
+                ", sourceCurrency=" + sourceCurrency +
+                ", targetAmount=" + targetAmount +
+                ", targetCurrency=" + targetCurrency +
+                ", creationDate=" + creationDate +
+                '}';
+    }
 }

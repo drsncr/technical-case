@@ -36,27 +36,26 @@ public class CurrencyConversionController {
     @Autowired
     CurrencyConversionService conversionService;
 
-    @GetMapping(value="/exchange-rate/{sourceCurrency}/{targetCurrency}", produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Gets the exchange of source currency and target currency pair")
+    @GetMapping(value="/exchange-rate/{sourceCurrency}/{targetCurrency}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<BigDecimal> getExchangeRate(@PathVariable Currency sourceCurrency, @PathVariable Currency targetCurrency){
         BigDecimal exchangeRate = exchangeRateService.getRateFromApi(sourceCurrency, targetCurrency);
         return new ResponseEntity<>(exchangeRate, HttpStatus.OK);
     }
 
-    @PostMapping(value="/target", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Converts given amount in certain currency to target currency")
+    @PostMapping(value="/target", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ConversionOutput> convertToTargetCurrency(@RequestBody @Valid ConversionInput conversionInput){
         ConversionOutput conversionOutput = conversionService.convertToTargetCurrency(conversionInput);
         return new ResponseEntity<>(conversionOutput, HttpStatus.CREATED);
     }
 
-    @PostMapping(value="/list", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Gets the list of filtered conversions via id and creation date")
+    @PostMapping(value="/list", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Conversion>> getConversionList(@RequestBody ConversionFilterObject conversionFilterObject,
                                                               @RequestParam(required = false, defaultValue = "0") Integer page,
                                                               @RequestParam(required = false, defaultValue = "5") Integer size){
         List<Conversion> conversionList = conversionService.getConversions(conversionFilterObject, page, size);
         return new ResponseEntity<>(conversionList, HttpStatus.OK);
     }
-
 }

@@ -18,4 +18,12 @@ public class ConversionOutput {
     public BigDecimal getTargetAmount() {
         return targetAmount;
     }
+
+    @Override
+    public String toString() {
+        return "ConversionOutput{" +
+                "id=" + id +
+                ", targetAmount=" + targetAmount +
+                '}';
+    }
 }

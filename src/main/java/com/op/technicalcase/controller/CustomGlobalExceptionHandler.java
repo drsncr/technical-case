@@ -11,6 +11,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -83,5 +84,11 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     public ResponseEntity<ExceptionObject> handleInvalidSizeNumberException(InvalidSizeNumberException ex, WebRequest webRequest){
         ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_SIZE_NUMBER_EXCEPTION, ex.getMessage());
         return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<ExceptionObject> handleHttpClientErrorException(HttpClientErrorException ex, WebRequest webRequest){
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.HTTP_CLIENT_ERROR_EXCEPTION, "There is no exchange for this currency");
+        return new ResponseEntity<>(exceptionObject, HttpStatus.NOT_FOUND);
     }
 }

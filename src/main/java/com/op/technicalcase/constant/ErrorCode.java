@@ -11,4 +11,5 @@ public class ErrorCode {
     public static final int INVALID_CONVERSION_INPUT_EXCEPTION = 107;
     public static final int INVALID_PAGE_NUMBER_EXCEPTION = 108;
     public static final int INVALID_SIZE_NUMBER_EXCEPTION = 109;
+    public static final int HTTP_CLIENT_ERROR_EXCEPTION = 110;
 }
