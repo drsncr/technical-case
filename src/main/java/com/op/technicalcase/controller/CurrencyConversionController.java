@@ -52,10 +52,10 @@ public class CurrencyConversionController {
 
     @ApiOperation(value = "Gets the list of filtered conversions via id and creation date")
     @PostMapping(value="/list", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Conversion>> getConversionList(@RequestBody ConversionFilterObject conversionFilterObject,
+    public ResponseEntity<PageableConversionListObject> getConversionList(@RequestBody ConversionFilterObject conversionFilterObject,
                                                               @RequestParam(required = false, defaultValue = "0") Integer page,
                                                               @RequestParam(required = false, defaultValue = "5") Integer size){
-        List<Conversion> conversionList = conversionService.getConversions(conversionFilterObject, page, size);
-        return new ResponseEntity<>(conversionList, HttpStatus.OK);
+        PageableConversionListObject pageableConversionListObject = conversionService.getConversions(conversionFilterObject, page, size);
+        return new ResponseEntity<>(pageableConversionListObject, HttpStatus.OK);
     }
 }

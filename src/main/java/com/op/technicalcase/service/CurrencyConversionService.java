@@ -3,12 +3,10 @@ package com.op.technicalcase.service;
 
 import com.op.technicalcase.constant.ErrorMessage;
 import com.op.technicalcase.exception.*;
-import com.op.technicalcase.model.Conversion;
-import com.op.technicalcase.model.ConversionFilterObject;
-import com.op.technicalcase.model.ConversionInput;
-import com.op.technicalcase.model.ConversionOutput;
+import com.op.technicalcase.model.*;
 import com.op.technicalcase.repository.CurrencyConversionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -49,7 +47,7 @@ public class CurrencyConversionService {
         return conversionOutput;
     }
 
-    public List<Conversion> getConversions(ConversionFilterObject conversionFilterObject, Integer page, Integer size) {
+    public PageableConversionListObject getConversions(ConversionFilterObject conversionFilterObject, Integer page, Integer size) {
         if(conversionFilterObject == null)
             throw new InvalidParameterException(ErrorMessage.INVALID_PARAMETER_MESSAGE, "conversionFilterObject");
         if(conversionFilterObject.getId() == null && conversionFilterObject.getCreationDate() == null)
@@ -66,7 +64,8 @@ public class CurrencyConversionService {
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.asc("id")));
-        List<Conversion> conversionList = conversionRepository.getConversionList(conversionFilterObject.getId(), creationDate, pageable);
-        return conversionList;
+        Page<Conversion> conversionList = conversionRepository.getConversionList(conversionFilterObject.getId(), creationDate, pageable);
+        PageableConversionListObject pageableConversionListObject = new PageableConversionListObject(conversionList);
+        return pageableConversionListObject;
     }
 }
