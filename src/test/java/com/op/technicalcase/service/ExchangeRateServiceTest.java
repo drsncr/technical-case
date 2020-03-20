@@ -1,6 +1,5 @@
 package com.op.technicalcase.service;
 
-import com.op.technicalcase.exception.CurrencyNullException;
 import com.op.technicalcase.exception.ExchangeRateNotFoundException;
 import com.op.technicalcase.exception.ExchangeRateServiceNotAvailableException;
 import com.op.technicalcase.model.ExchangeRate;
@@ -11,9 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
@@ -22,7 +19,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;

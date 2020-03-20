@@ -1,9 +1,5 @@
 package com.op.technicalcase.service;
 
-import com.op.technicalcase.exception.InSufficientQueryParamException;
-import com.op.technicalcase.exception.InvalidConversionInputException;
-import com.op.technicalcase.exception.InvalidPageNumberException;
-import com.op.technicalcase.exception.InvalidSizeNumberException;
 import com.op.technicalcase.model.Conversion;
 import com.op.technicalcase.model.ConversionFilterObject;
 import com.op.technicalcase.model.ConversionInput;
@@ -17,10 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.event.annotation.BeforeTestMethod;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

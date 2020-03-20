@@ -2,6 +2,7 @@ package com.op.technicalcase.controller;
 
 import com.op.technicalcase.model.ConversionFilterObject;
 import com.op.technicalcase.model.ConversionInput;
+import com.op.technicalcase.model.CurrencyPair;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +15,10 @@ import java.util.Currency;
 public class CurrencyConversionControllerAspect {
 
     @Before(value = "execution(* com.op.technicalcase.controller.CurrencyConversionController.getExchangeRate*(..)) " +
-            "&& args(sourceCurrency, targetCurrency)")
-    public void beforeGetExchangeRate(JoinPoint joinPoint, Currency sourceCurrency, Currency targetCurrency) {
+            "&& args(.., @RequestBody currencyPair)")
+    public void beforeGetExchangeRate(JoinPoint joinPoint, CurrencyPair currencyPair) {
         System.out.println("Before method:" + joinPoint.getSignature());
-        System.out.println("Source Currency : " + sourceCurrency + " Target Currency : " + targetCurrency);
+        System.out.println("Source Currency : " + currencyPair.getSourceCurrency() + " Target Currency : " + currencyPair.getTargetCurrency());
     }
 
     @Before(value = "execution(* com.op.technicalcase.controller.CurrencyConversionController.convertToTargetCurrency*(..)) " +

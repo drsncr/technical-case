@@ -1,10 +1,8 @@
 package com.op.technicalcase.service;
 
 
-import com.op.technicalcase.exception.InvalidConversionInputException;
-import com.op.technicalcase.exception.InSufficientQueryParamException;
-import com.op.technicalcase.exception.InvalidPageNumberException;
-import com.op.technicalcase.exception.InvalidSizeNumberException;
+import com.op.technicalcase.constant.ErrorMessage;
+import com.op.technicalcase.exception.*;
 import com.op.technicalcase.model.Conversion;
 import com.op.technicalcase.model.ConversionFilterObject;
 import com.op.technicalcase.model.ConversionInput;
@@ -13,6 +11,7 @@ import com.op.technicalcase.repository.CurrencyConversionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,11 +30,15 @@ public class CurrencyConversionService {
 
     public ConversionOutput convertToTargetCurrency(ConversionInput conversionInput) {
         if(conversionInput == null)
-            throw new InvalidConversionInputException();
-        if(conversionInput.getSourceAmount() == null || conversionInput.getSourceCurrency() == null || conversionInput.getTargetCurrency() == null)
-            throw new InvalidConversionInputException();
+            throw new InvalidParameterException(ErrorMessage.INVALID_PARAMETER_MESSAGE, "conversionInput");
+        if(conversionInput.getSourceAmount() == null)
+            throw new InvalidParameterException(ErrorMessage.INVALID_PARAMETER_MESSAGE, "sourceAmount");
+        if(conversionInput.getSourceCurrency() == null)
+            throw new InvalidParameterException(ErrorMessage.INVALID_PARAMETER_MESSAGE, "sourceCurrency");
+        if(conversionInput.getTargetCurrency() == null)
+            throw new InvalidParameterException(ErrorMessage.INVALID_PARAMETER_MESSAGE, "targetCurrency");
 
-        BigDecimal exchangeRate = exchangeRateService.getRateFromApi(conversionInput.getSourceCurrency(), conversionInput.getTargetCurrency());
+        BigDecimal exchangeRate = exchangeRateService.getExchangeRate(conversionInput.getSourceCurrency(), conversionInput.getTargetCurrency());
 
         Conversion conversion = new Conversion(conversionInput);
         conversion.setTargetAmount(conversionInput.getSourceAmount().multiply(exchangeRate));
@@ -47,20 +50,22 @@ public class CurrencyConversionService {
     }
 
     public List<Conversion> getConversions(ConversionFilterObject conversionFilterObject, Integer page, Integer size) {
-        if((conversionFilterObject == null) || (conversionFilterObject.getId() == null && conversionFilterObject.getCreationDate() == null))
-            throw new InSufficientQueryParamException();
+        if(conversionFilterObject == null)
+            throw new InvalidParameterException(ErrorMessage.INVALID_PARAMETER_MESSAGE, "conversionFilterObject");
+        if(conversionFilterObject.getId() == null && conversionFilterObject.getCreationDate() == null)
+            throw new InvalidParameterException(ErrorMessage.INVALID_CONVERSION_FILTER_OBJECT_MESSAGE, "Both id and creationDate");
         if(page < 0)
-            throw new InvalidPageNumberException();
+            throw new InvalidParameterException(ErrorMessage.INVALID_PAGE_PARAMETER_MESSAGE, "0");
         if(size < 1)
-            throw new InvalidSizeNumberException();
+            throw new InvalidParameterException(ErrorMessage.INVALID_SIZE_PARAMETER_MESSAGE, "1");
 
         LocalDate creationDate = null;
         if(conversionFilterObject.getCreationDate() != null){
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             creationDate = LocalDate.parse(conversionFilterObject.getCreationDate(), dateTimeFormatter);
         }
 
-        Pageable pageable = PageRequest.of(page,size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.asc("id")));
         List<Conversion> conversionList = conversionRepository.getConversionList(conversionFilterObject.getId(), creationDate, pageable);
         return conversionList;
     }

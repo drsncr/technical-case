@@ -37,9 +37,9 @@ public class CurrencyConversionController {
     CurrencyConversionService conversionService;
 
     @ApiOperation(value = "Gets the exchange of source currency and target currency pair")
-    @GetMapping(value="/exchange-rate/{sourceCurrency}/{targetCurrency}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<BigDecimal> getExchangeRate(@PathVariable Currency sourceCurrency, @PathVariable Currency targetCurrency){
-        BigDecimal exchangeRate = exchangeRateService.getRateFromApi(sourceCurrency, targetCurrency);
+    @PostMapping(value="/exchange-rate", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<BigDecimal> getExchangeRate(@RequestBody @Valid CurrencyPair currencyPair){
+        BigDecimal exchangeRate = exchangeRateService.getExchangeRate(currencyPair.getSourceCurrency(), currencyPair.getTargetCurrency());
         return new ResponseEntity<>(exchangeRate, HttpStatus.OK);
     }
 

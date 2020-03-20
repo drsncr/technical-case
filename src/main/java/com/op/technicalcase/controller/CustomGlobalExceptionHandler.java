@@ -1,6 +1,7 @@
 package com.op.technicalcase.controller;
 
 import com.op.technicalcase.constant.ErrorCode;
+import com.op.technicalcase.constant.ErrorMessage;
 import com.op.technicalcase.exception.*;
 import com.op.technicalcase.model.ExceptionObject;
 import org.springframework.beans.TypeMismatchException;
@@ -22,26 +23,32 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_METHOD_ARGUMENT_EXCEPTION, "Method arguments are not valid");
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_METHOD_ARGUMENT_EXCEPTION, ErrorMessage.INVALID_METHOD_ARGUMENT_MESSAGE);
         return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_METHOD_ARGUMENT_EXCEPTION, "Method arguments are not valid");
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_METHOD_ARGUMENT_EXCEPTION, ErrorMessage.INVALID_METHOD_ARGUMENT_MESSAGE);
         return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
     }
 
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_METHOD_ARGUMENT_EXCEPTION, "Method arguments are not valid");
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_METHOD_ARGUMENT_EXCEPTION, ErrorMessage.INVALID_METHOD_ARGUMENT_MESSAGE);
         return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(DateTimeParseException.class)
     public ResponseEntity<ExceptionObject> handleDateTimeParseException(DateTimeParseException ex, WebRequest webRequest){
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.DATETIME_PARSE_EXCEPTION, "Unrecognized date format. Date format should be dd-MM-yyyy");
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.DATETIME_PARSE_EXCEPTION, ErrorMessage.INVALID_DATE_FORMAT_MESSAGE);
         return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidParameterException.class)
+    public ResponseEntity<ExceptionObject> handleInvalidParameterExceptionn(InvalidParameterException ex, WebRequest webRequest){
+        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_PARAMETER_EXCEPTION, ex.getMessage());
+        return new ResponseEntity<>(exceptionObject, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ExchangeRateNotFoundException.class)
@@ -50,45 +57,9 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(InSufficientQueryParamException.class)
-    public ResponseEntity<ExceptionObject> handleInSufficientQueryParamException(InSufficientQueryParamException ex, WebRequest webRequest){
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INSUFFICIENT_QUERY_PARAM_EXCEPTION, ex.getMessage());
-        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(ExchangeRateServiceNotAvailableException.class)
     public ResponseEntity<ExceptionObject> handleExchangeRateServiceNotAvailableException(ExchangeRateServiceNotAvailableException ex, WebRequest webRequest){
         ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.EXCHANGE_RATE_SERVICE_NOT_AVAILABLE_EXCEPTION, ex.getMessage());
-        return new ResponseEntity<>(exceptionObject, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(CurrencyNullException.class)
-    public ResponseEntity<ExceptionObject> handleCurrencyNullException(CurrencyNullException ex, WebRequest webRequest){
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.CURRENCY_NULL_EXCEPTION, ex.getMessage());
-        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(InvalidConversionInputException.class)
-    public ResponseEntity<ExceptionObject> handleConversionInputInvalidException(InvalidConversionInputException ex, WebRequest webRequest){
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_CONVERSION_INPUT_EXCEPTION, ex.getMessage());
-        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(InvalidPageNumberException.class)
-    public ResponseEntity<ExceptionObject> handleInvalidPageNumberException(InvalidPageNumberException ex, WebRequest webRequest){
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_PAGE_NUMBER_EXCEPTION, ex.getMessage());
-        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(InvalidSizeNumberException.class)
-    public ResponseEntity<ExceptionObject> handleInvalidSizeNumberException(InvalidSizeNumberException ex, WebRequest webRequest){
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.INVALID_SIZE_NUMBER_EXCEPTION, ex.getMessage());
-        return new ResponseEntity<>(exceptionObject, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(HttpClientErrorException.class)
-    public ResponseEntity<ExceptionObject> handleHttpClientErrorException(HttpClientErrorException ex, WebRequest webRequest){
-        ExceptionObject exceptionObject = new ExceptionObject(ErrorCode.HTTP_CLIENT_ERROR_EXCEPTION, "There is no exchange for this currency");
         return new ResponseEntity<>(exceptionObject, HttpStatus.NOT_FOUND);
     }
 }
